@@ -26,14 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Local apps
-    'apps.users.apps.UsersConfig',  # Doit être avant les autres apps locales
-    'apps.courses.apps.CoursesConfig',
-    'apps.academic.apps.AcademicConfig',
-    'apps.messaging.apps.MessagingConfig',
-    'apps.community.apps.CommunityConfig',
-    
+
     # Third party apps
     'rest_framework',
     'rest_framework_simplejwt',
@@ -42,6 +35,13 @@ INSTALLED_APPS = [
     'django_filters',
     'channels',
     'whitenoise',
+
+    # Local apps
+    'apps.users.apps.UsersConfig',  # Must be first as other apps depend on it
+    'apps.courses.apps.CoursesConfig',
+    'apps.academic.apps.AcademicConfig',
+    'apps.messaging.apps.MessagingConfig',
+    'apps.community.apps.CommunityConfig',
 ]
 
 MIDDLEWARE = [
