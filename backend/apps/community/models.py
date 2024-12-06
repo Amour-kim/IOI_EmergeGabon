@@ -19,6 +19,7 @@ class Community(models.Model):
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='CommunityMembership',
+        through_fields=('community', 'user'),
         related_name='joined_communities',
         verbose_name=_('membres')
     )

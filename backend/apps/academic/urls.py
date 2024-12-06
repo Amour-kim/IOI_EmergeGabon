@@ -6,11 +6,11 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'academic-years', AcademicYearViewSet)
-router.register(r'semesters', SemesterViewSet)
-router.register(r'grades', GradeViewSet)
-router.register(r'attendance', AttendanceViewSet)
-router.register(r'schedules', ScheduleViewSet)
+router.register(r'academic-years', AcademicYearViewSet, basename='academic-year')
+router.register(r'semesters', SemesterViewSet, basename='semester')
+router.register(r'grades', GradeViewSet, basename='grade')
+router.register(r'attendance', AttendanceViewSet, basename='attendance')
+router.register(r'schedules', ScheduleViewSet, basename='schedule')
 
 urlpatterns = [
     path('', include(router.urls)),
