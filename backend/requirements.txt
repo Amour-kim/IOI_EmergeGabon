@@ -1,0 +1,39 @@
+# Django et REST framework
+Django==4.2.7
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.0
+django-cors-headers==4.3.0
+django-filter==23.3
+django-environ==0.11.2
+
+# Documentation API
+drf-yasg==1.21.7
+packaging==23.2
+
+# Base de données
+psycopg2-binary==2.9.9
+
+# Gestion des fichiers et images
+Pillow==10.1.0
+python-magic==0.4.27
+whitenoise==6.6.0
+
+# Outils de développement
+python-dotenv==1.0.0
+pytest==7.4.3
+pytest-django==4.7.0
+coverage==7.3.2
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+
+# Serveur WSGI
+gunicorn==21.2.0
+
+# Cache et tâches asynchrones
+redis==5.0.1
+celery==5.3.4
+
+# Sécurité
+django-cors-headers==4.3.0
+django-ratelimit==4.1.0
