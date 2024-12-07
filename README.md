@@ -34,29 +34,66 @@ Cette plateforme offre une solution complète pour la gestion académique et adm
 
 ## Fonctionnalités
 
-### Gestion des Utilisateurs
-- Multi-rôles (Admin, Enseignant, Étudiant, Personnel)
-- Authentification JWT
-- Profils personnalisés
-- Gestion des permissions
+### Gestion des Inscriptions
+- Formulaire d'inscription en ligne
+- Vérification automatique des informations
+- Génération de certificats
+- Suivi des dossiers en temps réel
+- Notifications automatiques
 
-### Gestion des Cours
-- Création et gestion des cours
-- Modules et contenus
-- Système d'inscription
-- Suivi de progression
+### Gestion Financière
+- Paiements en ligne sécurisés
+- Suivi des paiements
+- Génération automatique de reçus
+- Rapports financiers détaillés
+- Tableau de bord analytique
 
-### Gestion Académique
-- Années académiques et semestres
-- Notes et évaluations
-- Présences et absences
-- Emplois du temps
+### Système de Tutorat
+- Planification de sessions
+- Messagerie directe tuteur-étudiant
+- Suivi des progrès
+- Partage de ressources pédagogiques
+- Évaluation des sessions
 
-### Communication
-- Messagerie instantanée
-- Notifications en temps réel
-- Annonces ciblées
-- Partage de fichiers
+### Gestion des Départements
+- Organisation des cours par département
+- Gestion des enseignants
+- Publication d'annonces départementales
+- Analyses de performance
+
+### Gestion des Événements
+- Calendrier académique intégré
+- Système d'invitations et RSVP
+- Rappels automatiques
+- Sondages en temps réel
+
+### Activités et Projets
+- Gestion de projets académiques
+- Collaboration en équipe
+- Stockage et partage de fichiers
+- Suivi de l'avancement
+
+### Espace Communautaire
+- Forums de discussion
+- Messagerie privée
+- Groupes d'intérêt
+- Sondages communautaires
+
+### Système d'Information
+- Publication d'annonces
+- Notifications push
+- Archivage des communications
+- Section opportunités
+
+### Suivi des Diplômés
+- Base de données des alumni
+- Analyse des parcours professionnels
+- Networking
+
+### Bibliothèque Numérique
+- Ressources pédagogiques en ligne
+- Recherche avancée
+- Recommandations personnalisées
 
 ## Prérequis
 

@@ -8,6 +8,7 @@ import { frFR } from '@mui/material/locale';
 import Login from './components/auth/Login';
 import Dashboard from './components/dashboard/Dashboard';
 import Navbar from './components/layout/Navbar';
+import Home from './components/home/Home';
 
 // Create a theme instance
 const theme = createTheme({
@@ -34,6 +35,7 @@ const App: React.FC = () => {
       <Router>
         {isAuthenticated && <Navbar />}
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route 
             path="/login" 
             element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} 
@@ -41,10 +43,6 @@ const App: React.FC = () => {
           <Route 
             path="/dashboard" 
             element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/" 
-            element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} 
           />
         </Routes>
       </Router>
