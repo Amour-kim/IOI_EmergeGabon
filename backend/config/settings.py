@@ -37,11 +37,25 @@ INSTALLED_APPS = [
     'whitenoise',
 
     # Local apps
-    'apps.users.apps.UsersConfig',  # Must be first as other apps depend on it
-    'apps.courses.apps.CoursesConfig',
-    'apps.academic.apps.AcademicConfig',
-    'apps.messaging.apps.MessagingConfig',
-    'apps.community.apps.CommunityConfig',
+    'apps.abonnement',
+    'apps.academic',
+    'apps.authentication',
+    'apps.bibliotheque',
+    'apps.community',
+    'apps.core',
+    'apps.courses',
+    'apps.datacenter',
+    'apps.departements',
+    'apps.evenements',
+    'apps.finances',
+    'apps.inscriptions',
+    'apps.messagerie',
+    'apps.messaging',
+    'apps.pedagogie',
+    'apps.quiz',
+    'apps.tutorat',
+    'apps.universite',
+    'apps.users',
 ]
 
 MIDDLEWARE = [

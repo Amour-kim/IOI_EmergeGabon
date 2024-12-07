@@ -1,120 +1,105 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from .models import (
-    TypeAbonnement, Abonnement,
-    Paiement, Facture
+    PlanAbonnement, Abonnement,
+    HistoriquePaiement
 )
 
-@admin.register(TypeAbonnement)
-class TypeAbonnementAdmin(admin.ModelAdmin):
+@admin.register(PlanAbonnement)
+class PlanAbonnementAdmin(admin.ModelAdmin):
     list_display = (
-        'nom', 'code', 'prix_mensuel',
-        'prix_annuel', 'capacite_stockage',
-        'statut'
+        'nom', 'type_plan', 'prix_mensuel',
+        'prix_annuel', 'nb_max_datacenters'
     )
-    list_filter = ('statut',)
-    search_fields = ('nom', 'code', 'description')
+    search_fields = ('nom', 'description')
     
     fieldsets = (
         (None, {
-            'fields': ('nom', 'code', 'description')
+            'fields': ('nom', 'type_plan', 'description')
         }),
-        (_('Tarification'), {
+        (_('Prix'), {
             'fields': ('prix_mensuel', 'prix_annuel')
         }),
-        (_('Caractéristiques'), {
-            'fields': (
-                'capacite_stockage',
-                'nombre_utilisateurs_max',
-                'backup_inclus',
-                'support_prioritaire'
-            )
+        (_('Limites Datacenter'), {
+            'fields': ('nb_max_datacenters', 'capacite_datacenter')
         }),
-        (_('Statut'), {
-            'fields': ('statut',)
+        (_('Limites Bibliothèque'), {
+            'fields': ('nb_max_bibliotheques', 'capacite_bibliotheque')
         }),
+        (_('Limites Documentation'), {
+            'fields': ('nb_max_documentations', 'capacite_documentation')
+        })
     )
 
 @admin.register(Abonnement)
 class AbonnementAdmin(admin.ModelAdmin):
     list_display = (
-        'universite', 'type_abonnement',
-        'date_debut', 'date_fin',
-        'montant_total', 'statut'
+        'universite', 'plan', 'periodicite',
+        'date_debut', 'date_fin', 'etat'
     )
     list_filter = (
-        'universite', 'type_abonnement',
-        'periodicite', 'statut'
+        'universite', 'plan',
+        'periodicite', 'etat'
     )
     search_fields = (
         'universite__nom',
-        'type_abonnement__nom'
+        'plan__nom'
     )
     date_hierarchy = 'date_debut'
     
     fieldsets = (
         (None, {
             'fields': (
-                'universite', 'type_abonnement',
+                'universite', 'plan',
                 'periodicite'
             )
         }),
         (_('Période'), {
             'fields': ('date_debut', 'date_fin')
         }),
-        (_('Facturation'), {
+        (_('État'), {
             'fields': (
-                'montant_total',
-                'reduction_appliquee'
+                'etat',
+                'renouvellement_auto'
             )
         }),
-        (_('Statut'), {
-            'fields': ('statut',)
+        (_('Utilisation'), {
+            'fields': (
+                'nb_datacenters_utilises',
+                'nb_bibliotheques_utilisees',
+                'nb_documentations_utilisees',
+                'nb_serveurs_mail_utilises',
+                'nb_mediatheques_utilisees'
+            )
         }),
+        (_('Paiements'), {
+            'fields': (
+                'date_dernier_paiement',
+                'date_prochain_paiement'
+            )
+        }),
+        (_('Notes'), {
+            'fields': ('notes',)
+        })
     )
-    readonly_fields = ('montant_total',)
 
-@admin.register(Paiement)
-class PaiementAdmin(admin.ModelAdmin):
+@admin.register(HistoriquePaiement)
+class HistoriquePaiementAdmin(admin.ModelAdmin):
     list_display = (
         'abonnement', 'montant',
-        'mode_paiement', 'date_paiement',
+        'methode_paiement', 'date_paiement',
         'statut'
     )
     list_filter = (
         'abonnement__universite',
-        'mode_paiement', 'statut'
+        'methode_paiement', 'statut'
     )
     search_fields = (
         'abonnement__universite__nom',
         'reference_transaction'
     )
     date_hierarchy = 'date_paiement'
-    
     readonly_fields = (
         'reference_transaction',
         'date_paiement'
-    )
-
-@admin.register(Facture)
-class FactureAdmin(admin.ModelAdmin):
-    list_display = (
-        'numero_facture', 'abonnement',
-        'montant_total', 'date_emission',
-        'date_echeance', 'statut'
-    )
-    list_filter = (
-        'abonnement__universite',
-        'type_facture', 'statut'
-    )
-    search_fields = (
-        'numero_facture',
-        'abonnement__universite__nom'
-    )
-    date_hierarchy = 'date_emission'
-    
-    readonly_fields = (
-        'numero_facture',
-        'montant_total',
-        'date_emission'
     )
