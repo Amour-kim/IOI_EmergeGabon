@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Maquette - {{ filiere.code }} {{ filiere.nom }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pedagogie/css/maquette.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête de la maquette -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 mb-3">Maquette Pédagogique</h1>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ filiere.code }} - {{ filiere.nom }}</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Département :</strong> {{ filiere.departement.nom }}</p>
+                            <p><strong>Cycle :</strong> {{ filiere.cycle.nom }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Responsable :</strong> {{ filiere.responsable.get_full_name }}</p>
+                            <p><strong>Durée :</strong> {{ filiere.cycle.duree }} semestres</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Crédits totaux :</strong> {{ credits_totaux }}</p>
+                            <p><strong>Dernière mise à jour :</strong> {{ filiere.updated_at|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu de la maquette -->
+    {% for semestre in semestres %}
+    <div class="row mb-4">
+        <div class="col">
+            <h3 class="h4 mb-3">Semestre {{ semestre.numero }}</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Code UE</th>
+                            <th>Intitulé UE</th>
+                            <th>Crédits</th>
+                            <th>ECUEs</th>
+                            <th>Volume Horaire</th>
+                            <th>Enseignants</th>
+                            {% if user.is_staff or user.is_responsable %}
+                            <th>Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ue in semestre.ues %}
+                        <tr>
+                            <td>{{ ue.code }}</td>
+                            <td>
+                                <strong>{{ ue.intitule }}</strong>
+                                {% if ue.prerequis.exists %}
+                                <div class="small text-muted">
+                                    Prérequis : 
+                                    {% for prereq in ue.prerequis.all %}
+                                    {{ prereq.code }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ ue.credits }}</td>
+                            <td>
+                                {% for ecue in ue.ecues.all %}
+                                <div class="mb-2">
+                                    <strong>{{ ecue.code }}</strong> - {{ ecue.intitule }}
+                                    <div class="small text-muted">
+                                        {{ ecue.credits }} crédits - Coef. {{ ecue.coefficient }}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <div>CM : {{ ue.volume_horaire_cm }}h</div>
+                                <div>TD : {{ ue.volume_horaire_td }}h</div>
+                                <div>TP : {{ ue.volume_horaire_tp }}h</div>
+                                <div class="font-weight-bold">Total : {{ ue.volume_horaire_total }}h</div>
+                            </td>
+                            <td>
+                                {% for ecue in ue.ecues.all %}
+                                <div>
+                                    {{ ecue.enseignant.get_full_name }}
+                                    <div class="small text-muted">{{ ecue.code }}</div>
+                                </div>
+                                {% endfor %}
+                            </td>
+                            {% if user.is_staff or user.is_responsable %}
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'pedagogie:ue-detail' ue.id %}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'pedagogie:ue-edit' ue.id %}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if user.is_staff %}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteUEModal"
+                                            data-ue-id="{{ ue.id }}"
+                                            data-ue-code="{{ ue.code }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-info">
+                            <td colspan="2"><strong>Total Semestre {{ semestre.numero }}</strong></td>
+                            <td><strong>{{ semestre.credits }}</strong></td>
+                            <td>{{ semestre.nb_ecues }} ECUEs</td>
+                            <td>
+                                <strong>Total : {{ semestre.volume_total }}h</strong>
+                                <div class="small">
+                                    CM : {{ semestre.volume_cm }}h<br>
+                                    TD : {{ semestre.volume_td }}h<br>
+                                    TP : {{ semestre.volume_tp }}h
+                                </div>
+                            </td>
+                            <td colspan="{% if user.is_staff or user.is_responsable %}2{% else %}1{% endif %}">
+                                {{ semestre.nb_enseignants }} enseignant(s)
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Modal de confirmation de suppression -->
+    {% if user.is_staff %}
+    <div class="modal fade" id="deleteUEModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmer la suppression</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer l'UE <span id="ueCodeToDelete"></span> ?</p>
+                    <p class="text-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cette action est irréversible !
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <form id="deleteUEForm" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'pedagogie/js/maquette.js' %}"></script>
+{% endblock %}

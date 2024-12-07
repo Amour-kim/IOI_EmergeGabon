@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Planning des cours{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pedagogie/css/planning.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/fullcalendar/main.min.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête du planning -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2">Planning des cours</h1>
+                {% if user.is_staff or user.is_enseignant %}
+                <button type="button" 
+                        class="btn btn-primary" 
+                        data-toggle="modal" 
+                        data-target="#addSeanceModal">
+                    <i class="fas fa-plus"></i> Nouvelle séance
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form id="filterForm" class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="filiere">Filière</label>
+                            <select class="form-control" id="filiere" name="filiere">
+                                <option value="">Toutes les filières</option>
+                                {% for filiere in filieres %}
+                                <option value="{{ filiere.id }}">
+                                    {{ filiere.code }} - {{ filiere.nom }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="enseignant">Enseignant</label>
+                            <select class="form-control" id="enseignant" name="enseignant">
+                                <option value="">Tous les enseignants</option>
+                                {% for enseignant in enseignants %}
+                                <option value="{{ enseignant.id }}">
+                                    {{ enseignant.get_full_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="salle">Salle</label>
+                            <select class="form-control" id="salle" name="salle">
+                                <option value="">Toutes les salles</option>
+                                {% for salle in salles %}
+                                <option value="{{ salle }}">{{ salle }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="type_seance">Type de séance</label>
+                            <select class="form-control" id="type_seance" name="type_seance">
+                                <option value="">Tous les types</option>
+                                <option value="CM">Cours Magistral</option>
+                                <option value="TD">Travaux Dirigés</option>
+                                <option value="TP">Travaux Pratiques</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendrier -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'ajout de séance -->
+{% if user.is_staff or user.is_enseignant %}
+<div class="modal fade" id="addSeanceModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvelle séance</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="addSeanceForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ecue">ECUE</label>
+                                <select class="form-control" id="ecue" name="ecue" required>
+                                    <option value="">Sélectionner un ECUE</option>
+                                    {% for ecue in ecues %}
+                                    <option value="{{ ecue.id }}">
+                                        {{ ecue.code }} - {{ ecue.intitule }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="type">Type de séance</label>
+                                <select class="form-control" id="type" name="type_seance" required>
+                                    <option value="CM">Cours Magistral</option>
+                                    <option value="TD">Travaux Dirigés</option>
+                                    <option value="TP">Travaux Pratiques</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="date_debut">Date et heure de début</label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="date_debut" 
+                                       name="date_debut"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="date_fin">Date et heure de fin</label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="date_fin" 
+                                       name="date_fin"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="salle">Salle</label>
+                                <select class="form-control" id="salle" name="salle" required>
+                                    <option value="">Sélectionner une salle</option>
+                                    {% for salle in salles %}
+                                    <option value="{{ salle }}">{{ salle }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="enseignant">Enseignant</label>
+                                <select class="form-control" id="enseignant" name="enseignant" required>
+                                    <option value="">Sélectionner un enseignant</option>
+                                    {% for enseignant in enseignants %}
+                                    <option value="{{ enseignant.id }}">
+                                        {{ enseignant.get_full_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" 
+                                  id="description" 
+                                  name="description" 
+                                  rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal de détails de séance -->
+<div class="modal fade" id="seanceDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Détails de la séance</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="seanceDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                {% if user.is_staff or user.is_enseignant %}
+                <div class="btn-group">
+                    <button type="button" 
+                            id="startSeanceBtn" 
+                            class="btn btn-success"
+                            style="display: none;">
+                        Commencer
+                    </button>
+                    <button type="button" 
+                            id="endSeanceBtn" 
+                            class="btn btn-info"
+                            style="display: none;">
+                        Terminer
+                    </button>
+                    <button type="button" 
+                            id="cancelSeanceBtn" 
+                            class="btn btn-danger"
+                            style="display: none;">
+                        Annuler
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/fullcalendar/main.min.js' %}"></script>
+<script src="{% static 'vendor/fullcalendar/locales/fr.js' %}"></script>
+<script src="{% static 'pedagogie/js/planning.js' %}"></script>
+{% endblock %}

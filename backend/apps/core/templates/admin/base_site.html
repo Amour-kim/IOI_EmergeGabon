@@ -1,0 +1,185 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Administration Gabon EDU') }}{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
+<style>
+    /* Styles supplémentaires spécifiques à la page */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .stat-card {
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all var(--transition-speed);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .stat-label {
+        color: var(--dark-color);
+        margin-top: 0.5rem;
+    }
+
+    /* Quick Actions Menu */
+    .quick-actions {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 1000;
+    }
+
+    .quick-actions-button {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: var(--light-color);
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all var(--transition-speed);
+    }
+
+    .quick-actions-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .quick-actions-menu {
+        position: absolute;
+        bottom: 70px;
+        right: 0;
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 0.5rem;
+        display: none;
+    }
+
+    .quick-actions-menu.show {
+        display: block;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .quick-action-item {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: var(--dark-color);
+        text-decoration: none;
+        border-radius: var(--border-radius);
+        transition: all var(--transition-speed);
+    }
+
+    .quick-action-item:hover {
+        background: rgba(26,115,232,0.1);
+        color: var(--primary-color);
+    }
+
+    /* Dark Mode Styles */
+    .dark-mode {
+        background-color: var(--dark-color);
+        color: var(--light-color);
+    }
+
+    .dark-mode .module {
+        background: #2d2d2d;
+    }
+
+    .dark-mode .stat-card {
+        background: #2d2d2d;
+    }
+
+    .dark-mode .quick-actions-menu {
+        background: #2d2d2d;
+    }
+
+    .dark-mode .quick-action-item {
+        color: var(--light-color);
+    }
+
+    .dark-mode .quick-action-item:hover {
+        background: rgba(255,255,255,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        {{ site_header|default:_('Administration Gabon EDU') }}
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block footer %}
+<div class="quick-actions">
+    <button class="quick-actions-button" id="quickActionsToggle">
+        <span>+</span>
+    </button>
+    <div class="quick-actions-menu" id="quickActionsMenu">
+        <a href="{% url 'admin:index' %}" class="quick-action-item">
+            <i class="fas fa-home"></i> Tableau de bord
+        </a>
+        <a href="{% url 'admin:auth_user_add' %}" class="quick-action-item">
+            <i class="fas fa-user-plus"></i> Nouvel utilisateur
+        </a>
+        <a href="#" class="quick-action-item" id="darkModeToggle">
+            <i class="fas fa-moon"></i> Mode sombre
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+<script src="{% static 'admin/js/custom_admin.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Quick Actions Toggle
+        const quickActionsToggle = document.getElementById('quickActionsToggle');
+        const quickActionsMenu = document.getElementById('quickActionsMenu');
+
+        quickActionsToggle.addEventListener('click', () => {
+            quickActionsMenu.classList.toggle('show');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.quick-actions')) {
+                quickActionsMenu.classList.remove('show');
+            }
+        });
+    });
+</script>
+{% endblock %}

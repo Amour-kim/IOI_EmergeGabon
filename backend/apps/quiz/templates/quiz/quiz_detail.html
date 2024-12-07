@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ quiz.titre }} - Quiz{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'quiz/css/quiz.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    <header class="quiz-header">
+        <h1>{{ quiz.titre }}</h1>
+        <div class="quiz-meta">
+            <span class="quiz-course">{{ quiz.cours.intitule }}</span>
+            <span class="quiz-duration">{{ quiz.duree }} minutes</span>
+            <span class="quiz-attempts">{{ quiz.nombre_tentatives }} tentative(s)</span>
+        </div>
+        <p class="quiz-description">{{ quiz.description }}</p>
+    </header>
+
+    {% if quiz.actif %}
+        {% if can_take_quiz %}
+            <div class="quiz-actions">
+                <form method="post" action="{% url 'quiz:take-quiz' quiz.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        Commencer le Quiz
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="quiz-warning">
+                {% if tentatives_epuisees %}
+                    <p>Vous avez épuisé toutes vos tentatives pour ce quiz.</p>
+                {% else %}
+                    <p>Vous ne pouvez pas prendre ce quiz pour le moment.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if previous_attempts %}
+            <section class="previous-attempts">
+                <h2>Tentatives précédentes</h2>
+                <div class="attempts-list">
+                    {% for tentative in previous_attempts %}
+                        <div class="attempt-card">
+                            <div class="attempt-header">
+                                <span class="attempt-number">
+                                    Tentative {{ tentative.numero_tentative }}
+                                </span>
+                                <span class="attempt-date">
+                                    {{ tentative.date_debut|date:"d/m/Y H:i" }}
+                                </span>
+                            </div>
+                            <div class="attempt-details">
+                                <div class="attempt-score">
+                                    <span class="score-label">Note :</span>
+                                    <span class="score-value">
+                                        {{ tentative.note|default_if_none:"-" }}/100
+                                    </span>
+                                </div>
+                                <div class="attempt-status">
+                                    <span class="status-label">Statut :</span>
+                                    <span class="status-value status-{{ tentative.statut|lower }}">
+                                        {{ tentative.get_statut_display }}
+                                    </span>
+                                </div>
+                                {% if tentative.statut == 'TERMINEE' %}
+                                    <div class="attempt-time">
+                                        <span class="time-label">Temps passé :</span>
+                                        <span class="time-value">
+                                            {{ tentative.temps_passe }} minutes
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if tentative.statut == 'TERMINEE' %}
+                                <div class="attempt-actions">
+                                    <a href="{% url 'quiz:review-attempt' tentative.id %}"
+                                       class="btn btn-secondary">
+                                        Revoir la tentative
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+    {% else %}
+        <div class="quiz-inactive">
+            <p>Ce quiz n'est pas disponible pour le moment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'quiz/js/quiz.js' %}"></script>
+{% endblock %}

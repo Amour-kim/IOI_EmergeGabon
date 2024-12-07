@@ -1,0 +1,193 @@
+/* Quiz Container */
+.quiz-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Quiz Header */
+.quiz-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.quiz-header h1 {
+    margin: 0 0 1rem;
+    color: #2c3e50;
+    font-size: 2.5rem;
+}
+
+.quiz-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.quiz-description {
+    margin-top: 1rem;
+    color: #444;
+    line-height: 1.6;
+}
+
+/* Quiz Actions */
+.quiz-actions {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.quiz-warning {
+    padding: 1rem;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 0.25rem;
+    color: #856404;
+    margin: 2rem 0;
+}
+
+/* Previous Attempts Section */
+.previous-attempts {
+    margin-top: 3rem;
+}
+
+.previous-attempts h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.attempts-list {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* Attempt Card */
+.attempt-card {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.attempt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.attempt-number {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.attempt-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.attempt-details {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.attempt-score,
+.attempt-status,
+.attempt-time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.score-label,
+.status-label,
+.time-label {
+    color: #666;
+}
+
+.score-value {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.status-value {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+}
+
+.status-en_cours {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.status-terminee {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.attempt-actions {
+    text-align: right;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+/* Quiz Inactive State */
+.quiz-inactive {
+    text-align: center;
+    padding: 3rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    color: #6c757d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .quiz-container {
+        padding: 1rem;
+    }
+
+    .quiz-header h1 {
+        font-size: 2rem;
+    }
+
+    .quiz-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .attempts-list {
+        grid-template-columns: 1fr;
+    }
+}

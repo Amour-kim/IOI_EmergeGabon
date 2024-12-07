@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Carte Étudiante</title>
+    <style>
+        @page {
+            size: 85.6mm 53.98mm; /* Format carte bancaire */
+            margin: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 85.6mm;
+            height: 53.98mm;
+            position: relative;
+        }
+        .carte {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a5f7a 0%, #2980b9 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            padding: 3mm;
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            width: 10mm;
+            height: auto;
+            margin-right: 2mm;
+        }
+        .titre-universite {
+            font-size: 6pt;
+            line-height: 1.2;
+        }
+        .photo {
+            position: absolute;
+            top: 12mm;
+            left: 3mm;
+            width: 25mm;
+            height: 32mm;
+            background-color: white;
+            border: 0.5mm solid white;
+        }
+        .infos {
+            position: absolute;
+            top: 12mm;
+            left: 31mm;
+            right: 3mm;
+            font-size: 6pt;
+            line-height: 1.4;
+        }
+        .matricule {
+            position: absolute;
+            bottom: 3mm;
+            left: 3mm;
+            font-size: 7pt;
+            font-weight: bold;
+        }
+        .qr-code {
+            position: absolute;
+            bottom: 3mm;
+            right: 3mm;
+            width: 12mm;
+            height: 12mm;
+            background-color: white;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 24pt;
+            color: rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+        }
+        .annee {
+            position: absolute;
+            bottom: 3mm;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="carte">
+        <div class="watermark">
+            {{ universite.nom_court }}
+        </div>
+
+        <div class="header">
+            <img src="{{ logo_url }}" alt="Logo" class="logo">
+            <div class="titre-universite">
+                <strong>{{ universite.nom }}</strong><br>
+                CARTE D'ÉTUDIANT
+            </div>
+        </div>
+
+        <img src="{{ etudiant.photo.url }}" alt="Photo" class="photo">
+
+        <div class="infos">
+            <strong>{{ etudiant.get_full_name }}</strong><br>
+            Né(e) le : {{ etudiant.date_naissance|date:"d/m/Y" }}<br>
+            Département : {{ certificat.dossier.departement.nom }}<br>
+            Niveau : {{ certificat.dossier.niveau_etude }}<br>
+            Validité : {{ certificat.valide_jusqu_au|date:"d/m/Y" }}
+        </div>
+
+        <div class="matricule">
+            {{ etudiant.matricule }}
+        </div>
+
+        <div class="annee">
+            {{ certificat.dossier.annee_academique }}
+        </div>
+
+        <img src="{{ qr_code_url }}" alt="QR Code" class="qr-code">
+    </div>
+</body>
+</html>

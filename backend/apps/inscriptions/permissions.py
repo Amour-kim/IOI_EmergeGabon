@@ -20,3 +20,27 @@ class IsOwnerOrStaff(permissions.BasePermission):
             return obj.dossier.etudiant == request.user
 
         return False
+
+class IsAdminOrScolarite(permissions.BasePermission):
+    """
+    Permission permettant uniquement aux administrateurs et au personnel
+    de la scolarité d'accéder à la vue.
+    """
+    def has_permission(self, request, view):
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            (request.user.is_staff or request.user.role == 'SCOLARITE')
+        )
+
+class IsOwnerOrAdmin(permissions.BasePermission):
+    """
+    Permission permettant à l'étudiant propriétaire ou aux administrateurs
+    d'accéder à l'objet.
+    """
+    def has_object_permission(self, request, view, obj):
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            (request.user.is_staff or request.user == obj.etudiant)
+        )

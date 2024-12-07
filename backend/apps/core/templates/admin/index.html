@@ -1,0 +1,240 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .dashboard-container {
+        padding: 2rem;
+    }
+
+    .welcome-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: var(--light-color);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-subtitle {
+        opacity: 0.9;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .app-group {
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all var(--transition-speed);
+    }
+
+    .app-group:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .app-group h2 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .model-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .model-item {
+        margin-bottom: 0.5rem;
+    }
+
+    .model-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        color: var(--dark-color);
+        text-decoration: none;
+        border-radius: var(--border-radius);
+        transition: all var(--transition-speed);
+    }
+
+    .model-link:hover {
+        background: rgba(26,115,232,0.1);
+        color: var(--primary-color);
+    }
+
+    .model-icon {
+        margin-right: 0.5rem;
+        width: 20px;
+        height: 20px;
+    }
+
+    .recent-actions {
+        grid-column: 1 / -1;
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .recent-actions h2 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .action-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .action-item:last-child {
+        border-bottom: none;
+    }
+
+    .action-time {
+        color: #666;
+        font-size: 0.9rem;
+        margin-right: 1rem;
+    }
+
+    /* Dark Mode Styles */
+    .dark-mode .app-group,
+    .dark-mode .recent-actions {
+        background: #2d2d2d;
+    }
+
+    .dark-mode .model-link {
+        color: var(--light-color);
+    }
+
+    .dark-mode .model-link:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .dark-mode .action-item {
+        border-bottom-color: #444;
+    }
+
+    .dark-mode .action-time {
+        color: #aaa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="welcome-card">
+        <h1 class="welcome-title">{% trans 'Bienvenue,' %} {{ user.get_full_name|default:user.username }}</h1>
+        <p class="welcome-subtitle">{% trans "Voici votre tableau de bord d'administration" %}</p>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ user_count }}</div>
+            <div class="stat-label">{% trans 'Utilisateurs' %}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ university_count }}</div>
+            <div class="stat-label">{% trans 'Universités' %}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ student_count }}</div>
+            <div class="stat-label">{% trans 'Étudiants' %}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ teacher_count }}</div>
+            <div class="stat-label">{% trans 'Enseignants' %}</div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        {% for app in app_list %}
+        <div class="app-group">
+            <h2>
+                <i class="fas fa-{{ app.icon|default:'folder' }}"></i>
+                {{ app.name }}
+            </h2>
+            <ul class="model-list">
+                {% for model in app.models %}
+                <li class="model-item">
+                    {% if model.admin_url %}
+                    <a href="{{ model.admin_url }}" class="model-link">
+                        <i class="fas fa-{{ model.icon|default:'circle' }} model-icon"></i>
+                        {{ model.name }}
+                    </a>
+                    {% else %}
+                    {{ model.name }}
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+
+        <div class="recent-actions">
+            <h2>{% trans 'Actions récentes' %}</h2>
+            {% load log %}
+            {% get_admin_log 10 as admin_log %}
+            {% if not admin_log %}
+            <p>{% trans 'Aucune action récente.' %}</p>
+            {% else %}
+            <ul class="action-list">
+                {% for entry in admin_log %}
+                <li class="action-item">
+                    <span class="action-time">{{ entry.action_time|date:"d/m/Y H:i" }}</span>
+                    {% if entry.is_addition %}
+                    <i class="fas fa-plus-circle" style="color: var(--success-color);"></i>
+                    {% elif entry.is_change %}
+                    <i class="fas fa-edit" style="color: var(--warning-color);"></i>
+                    {% elif entry.is_deletion %}
+                    <i class="fas fa-trash" style="color: var(--error-color);"></i>
+                    {% endif %}
+                    <span class="action-description">
+                        {{ entry.object_repr }}
+                        {% if entry.content_type %}
+                        <span class="mini quiet">({{ entry.content_type }})</span>
+                        {% endif %}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

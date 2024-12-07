@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ ressource.titre }} - Bibliothèque{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'bibliotheque/css/bibliotheque.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ressource-container">
+    <header class="ressource-header">
+        <div class="ressource-meta">
+            <span class="ressource-type badge">{{ ressource.get_type_ressource_display }}</span>
+            <span class="ressource-langue badge">{{ ressource.get_langue_display }}</span>
+        </div>
+        <h1>{{ ressource.titre }}</h1>
+        <div class="ressource-info">
+            <p class="ressource-author">Par {{ ressource.auteur }}</p>
+            <p class="ressource-date">{{ ressource.annee_publication }}</p>
+        </div>
+    </header>
+
+    <div class="ressource-content">
+        <div class="ressource-preview">
+            {% if ressource.miniature %}
+                <img src="{{ ressource.miniature.url }}" alt="Aperçu de {{ ressource.titre }}"
+                     class="ressource-thumbnail">
+            {% endif %}
+            
+            {% if ressource.est_public or can_download %}
+                <div class="ressource-actions">
+                    <a href="{% url 'bibliotheque:download-resource' ressource.id %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        Télécharger
+                    </a>
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#addToCollectionModal">
+                            <i class="fas fa-folder-plus"></i>
+                            Ajouter à une collection
+                        </button>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="ressource-details">
+            <section class="ressource-description">
+                <h2>Description</h2>
+                {{ ressource.description|linebreaks }}
+            </section>
+
+            <section class="ressource-metadata">
+                <h2>Informations</h2>
+                <dl>
+                    <dt>Catégorie</dt>
+                    <dd>{{ ressource.categorie.chemin_complet }}</dd>
+
+                    {% if ressource.cours %}
+                        <dt>Cours</dt>
+                        <dd>{{ ressource.cours.code }} - {{ ressource.cours.intitule }}</dd>
+                    {% endif %}
+
+                    <dt>Format</dt>
+                    <dd>{{ ressource.get_type_ressource_display }}</dd>
+
+                    <dt>Langue</dt>
+                    <dd>{{ ressource.get_langue_display }}</dd>
+
+                    <dt>Année de publication</dt>
+                    <dd>{{ ressource.annee_publication }}</dd>
+
+                    {% if ressource.mots_cles %}
+                        <dt>Mots-clés</dt>
+                        <dd>
+                            {% for mot in ressource.mots_cles %}
+                                <span class="badge badge-info">{{ mot }}</span>
+                            {% endfor %}
+                        </dd>
+                    {% endif %}
+                </dl>
+            </section>
+
+            <section class="ressource-stats">
+                <h2>Statistiques</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ ressource.nombre_telechargements }}</span>
+                        <span class="stat-label">Téléchargements</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ ressource.note_moyenne|floatformat:1 }}/5</span>
+                        <span class="stat-label">Note moyenne</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ ressource.nombre_evaluations }}</span>
+                        <span class="stat-label">Évaluations</span>
+                    </div>
+                </div>
+            </section>
+
+            {% if user.is_authenticated %}
+                <section class="ressource-evaluation">
+                    <h2>Évaluer cette ressource</h2>
+                    <form method="post" action="{% url 'bibliotheque:evaluate-resource' ressource.id %}">
+                        {% csrf_token %}
+                        <div class="rating">
+                            {% for i in "12345" %}
+                                <input type="radio" name="note" value="{{ i }}"
+                                       id="star{{ i }}" {% if evaluation.note == i %}checked{% endif %}>
+                                <label for="star{{ i }}"></label>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label for="commentaire">Commentaire</label>
+                            <textarea name="commentaire" id="commentaire" rows="3"
+                                      class="form-control">{{ evaluation.commentaire }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Envoyer l'évaluation
+                        </button>
+                    </form>
+                </section>
+            {% endif %}
+
+            <section class="ressource-evaluations">
+                <h2>Évaluations</h2>
+                {% if ressource.evaluations.exists %}
+                    <div class="evaluations-list">
+                        {% for evaluation in ressource.evaluations.all %}
+                            <div class="evaluation-card">
+                                <div class="evaluation-header">
+                                    <div class="evaluation-rating">
+                                        {% for i in "12345" %}
+                                            <span class="star {% if i <= evaluation.note %}filled{% endif %}">
+                                                ★
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="evaluation-date">
+                                        {{ evaluation.created_at|date:"d/m/Y" }}
+                                    </span>
+                                </div>
+                                {% if evaluation.commentaire %}
+                                    <p class="evaluation-comment">
+                                        {{ evaluation.commentaire }}
+                                    </p>
+                                {% endif %}
+                                <p class="evaluation-author">
+                                    Par {{ evaluation.utilisateur.get_full_name }}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Aucune évaluation pour le moment.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+    <div class="modal fade" id="addToCollectionModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter à une collection</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addToCollectionForm">
+                        {% if collections %}
+                            <div class="form-group">
+                                <label for="collection">Choisir une collection existante</label>
+                                <select name="collection" id="collection" class="form-control">
+                                    {% for collection in collections %}
+                                        <option value="{{ collection.id }}">
+                                            {{ collection.nom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="form-group">
+                            <label for="nouvelle_collection">Ou créer une nouvelle collection</label>
+                            <input type="text" name="nouvelle_collection" id="nouvelle_collection"
+                                   class="form-control" placeholder="Nom de la collection">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" id="addToCollectionBtn">
+                        Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'bibliotheque/js/bibliotheque.js' %}"></script>
+{% endblock %}

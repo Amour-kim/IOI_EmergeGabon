@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Attestation d'Inscription</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm;
+        }
+        body {
+            font-family: Times New Roman, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2cm;
+        }
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 1cm;
+        }
+        .titre {
+            font-size: 18pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 1cm 0;
+        }
+        .content {
+            text-align: justify;
+            margin: 2cm 0;
+        }
+        .signature {
+            margin-top: 3cm;
+            text-align: right;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+        }
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 72pt;
+            color: rgba(200, 200, 200, 0.2);
+            z-index: -1;
+        }
+        .qr-code {
+            position: fixed;
+            bottom: 2cm;
+            left: 2cm;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">
+        {{ universite.nom }}
+    </div>
+
+    <div class="header">
+        <img src="{{ logo_url }}" alt="Logo" class="logo">
+        <div>
+            <strong>RÉPUBLIQUE GABONAISE</strong><br>
+            Union - Travail - Justice<br><br>
+            <strong>{{ universite.nom }}</strong><br>
+            {{ universite.adresse }}
+        </div>
+    </div>
+
+    <div class="titre">
+        Attestation d'Inscription<br>
+        Année Académique {{ certificat.dossier.annee_academique }}
+    </div>
+
+    <div class="content">
+        <p>Je soussigné(e), {{ universite.recteur.titre }} {{ universite.recteur.nom }},
+        Recteur de {{ universite.nom }}, atteste que :</p>
+
+        <p style="margin-left: 2cm;">
+            <strong>{{ etudiant.civilite }} {{ etudiant.get_full_name }}</strong><br>
+            Né(e) le {{ etudiant.date_naissance|date:"d/m/Y" }} à {{ etudiant.lieu_naissance }}<br>
+            Nationalité : {{ etudiant.nationalite }}<br>
+            Matricule : {{ etudiant.matricule }}
+        </p>
+
+        <p>est régulièrement inscrit(e) pour l'année académique {{ certificat.dossier.annee_academique }}
+        en qualité d'étudiant(e) en <strong>{{ certificat.dossier.niveau_etude }}</strong>
+        au département de <strong>{{ certificat.dossier.departement.nom }}</strong>.</p>
+
+        <p>Cette inscription a été enregistrée sous le numéro {{ certificat.dossier.numero_inscription }}
+        et donne droit à la délivrance de la carte d'étudiant.</p>
+
+        <p>En foi de quoi, la présente attestation est délivrée pour servir et valoir ce que de droit.</p>
+    </div>
+
+    <div class="signature">
+        <p>Fait à {{ universite.ville }}, le {{ certificat.date_generation|date:"d/m/Y" }}</p>
+        <p>Pour le Recteur et par délégation,<br>
+        Le Directeur des Affaires Académiques</p>
+    </div>
+
+    <img src="{{ qr_code_url }}" alt="QR Code" class="qr-code">
+
+    <div class="footer">
+        <p>
+            Attestation N° {{ certificat.numero }} - Valide jusqu'au {{ certificat.valide_jusqu_au|date:"d/m/Y" }}<br>
+            L'authenticité de cette attestation peut être vérifiée en scannant le QR code ou en visitant {{ universite.site_web }}
+        </p>
+    </div>
+</body>
+</html>
